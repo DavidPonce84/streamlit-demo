@@ -85,15 +85,18 @@ with tab1:
 
 with tab2:
     st.header("Visión artificial")
-    st.write("Baseline offline para demostrar el flujo de imagen → modelo → probabilidades. En producción se reemplaza por MobileNet/ResNet con pesos validados.")
+    st.write("Clasificación de imágenes integrada con MobileNetV2 (PyTorch) y fallback didáctico offline.")
     uploaded = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"], key="vision")
+    force_base = st.checkbox("Usar baseline heurístico didáctico", value=False)
     if uploaded:
         image = load_image(uploaded.getvalue())
         st.image(image, caption="Imagen recibida", width=320)
-        result = classify_image(image)
+        result = classify_image(image, force_baseline=force_base)
+        model_name = result.get("model_name", "Visión artificial")
+        st.caption(f"Modelo activo: **{model_name}**")
         st.success(f"Clase estimada: {result['label']} · confianza {result['confidence']:.1%}")
         st.bar_chart(pd.Series(result["probabilities"], name="probabilidad"))
-        st.warning("Este baseline es didáctico y no debe usarse para decisiones reales. La confianza no garantiza exactitud.")
+        st.warning("Este modelo es con fines de demostración y no debe usarse para decisiones críticas sin validación adicional.")
     else:
         st.info("Sube una imagen para ejecutar el flujo de visión.")
 
