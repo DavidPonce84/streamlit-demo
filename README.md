@@ -21,21 +21,24 @@ Showcase educativo para demostrar cómo una aplicación Streamlit integra:
 
 ```text
 app.py
-models/random_forest_renewal.joblib
-models/model_metadata.json
-src/model_registry.py
-src/chatbot.py
-documents/
-tests/
+models/random_forest_renewal.joblib  # Modelo binario serializado (RandomForest)
+models/model_metadata.json          # Ficha técnica y métricas en formato JSON
+src/model_registry.py               # Carga y validación de artefactos
+src/chatbot.py                      # Interfaz de conversación
+documents/                          # Base de conocimientos local (RAG)
+tests/                              # Pruebas unitarias automatizadas (19 tests)
 ```
+
+- **`models/random_forest_renewal.joblib`**: Artefacto binario con el modelo `RandomForestClassifier` entrenado. Ejecuta las predicciones en tiempo real.
+- **`models/model_metadata.json`**: Ficha técnica legible con metadatos (features requeridas, `target`, `random_state` y métricas de desempeño como `accuracy`, `f1` y `auc`).
 
 La aplicación indica en pantalla si cargó el artefacto serializado o si activó el fallback determinístico.
 
 ## Ejecución local
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
-cd streamlit-ai-lab
+git clone https://github.com/DavidPonce84/streamlit-demo.git
+cd streamlit-demo
 python -m venv .venv
 source .venv/bin/activate       # macOS/Linux
 # .venv\Scripts\activate      # Windows
