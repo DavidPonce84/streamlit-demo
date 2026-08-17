@@ -9,5 +9,5 @@ models/*.pt
 models/*.pth
 !models/README.md
 !models/*.joblib
-*.log
+.cache/
 .streamlit/secrets.toml
