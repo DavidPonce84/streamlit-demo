@@ -1,138 +1,113 @@
-# Streamlit AI Lab
+# Streamlit AI Lab ⚡
 
-Showcase educativo para demostrar cómo una aplicación Streamlit integra:
+Showcase educativo e interactivo con interfaz inspirada en el **Design System de Apple (macOS/iOS)** para demostrar cómo una aplicación de Inteligencia Aplicada integra:
 
-1. **Predicción tabular:** Random Forest, predicción individual y masiva.
-2. **Explicabilidad:** importancia global y explicación local con SHAP/LIME cuando están instalados; fallback transparente cuando no lo están.
-3. **Visión:** flujo offline de imagen → predicción → probabilidades, con baseline didáctico seguro para una clase en vivo.
-4. **RAG/chatbot controlado:** recuperación documental con fuentes y fallback local seguro, sin API keys.
-5. **Artefacto serializado:** el Random Forest preentrenado vive en `models/random_forest_renewal.joblib` cuando se versiona con la estrategia elegida.
-6. **Visión avanzada opcional:** referencia documentada a MobileNetV2, manteniendo baseline offline para el demo estable.
+1. **Predicción Tabular & XAI:** Modelo Random Forest explicable, métricas globales (Accuracy, F1, AUC), predicción individual con medidor Donut Gauge, predicción masiva por CSV y gráficos bidireccionales de impacto de características (SHAP/LIME o fallback).
+2. **Visión Artificial en Tiempo Real:** Clasificación de imágenes integrada por defecto con **PyTorch y MobileNetV2** (descarga automática y almacenamiento en caché de pesos de ImageNet de 14 MB en la primera ejecución), con opción de alternar al baseline didáctico offline.
+3. **RAG / Chatbot Conversacional Local:** Recuperación documental fundamentada en `documents/` con citas de fuentes, puntuación de relevancia y respuestas controladas 100% privadas.
+4. **Artefactos & Metadatos del Modelo:**
+   - **`models/random_forest_renewal.joblib`**: Objeto binario del modelo de Machine Learning entrenado (`RandomForestClassifier`).
+   - **`models/model_metadata.json`**: Ficha técnica en texto plano con variables requeridas, `random_state` y métricas de desempeño.
 
-> **Mensaje didáctico:** Streamlit no es el modelo. Es la capa que convierte un modelo en una solución demostrable y utilizable.
+> **Mensaje didáctico:** Streamlit no es el modelo. Es la capa de diseño y experiencia de usuario que convierte un modelo de IA en una solución demostrable, transparente y utilizable.
+
+---
 
 ## Requisitos
 
 - Python 3.10–3.12 recomendado.
-- Entorno virtual.
-- No se necesitan credenciales ni conexión a APIs externas para el demo base.
+- Entorno virtual (`.venv`).
+- No requiere credenciales ni conexión a APIs de pago externas.
 
-## Estructura relevante
+---
+
+## Estructura Relevante
 
 ```text
-app.py
-models/random_forest_renewal.joblib  # Modelo binario serializado (RandomForest)
-models/model_metadata.json          # Ficha técnica y métricas en formato JSON
-src/model_registry.py               # Carga y validación de artefactos
-src/chatbot.py                      # Interfaz de conversación
-documents/                          # Base de conocimientos local (RAG)
-tests/                              # Pruebas unitarias automatizadas (19 tests)
+app.py                                # Interfaz principal Streamlit con Apple Design System
+src/
+├── ui_components.py                  # Componentes de diseño Apple y gráficos con Altair
+├── tabular.py                        # Entrenamiento y predicción del modelo Random Forest
+├── explainability.py                 # Explicaciones locales y globales (SHAP/LIME/fallback)
+├── vision.py                         # Clasificador PyTorch MobileNetV2 + fallback didáctico
+├── rag.py                            # Motor RAG local de recuperación documental
+├── chatbot.py                        # Lógica de respuesta fundamentada con citas
+└── model_registry.py                 # Carga segura y validación de artefactos y metadatos
+models/
+├── random_forest_renewal.joblib      # Modelo binario serializado (Random Forest)
+└── model_metadata.json              # Ficha técnica y métricas en formato JSON
+documents/                            # Base de conocimientos local en Markdown
+tests/                                # Suite de 24 pruebas unitarias automatizadas
+requirements.txt                      # Dependencias principales (Streamlit, PyTorch, Scikit-Learn, Altair, etc.)
 ```
 
-- **`models/random_forest_renewal.joblib`**: Artefacto binario con el modelo `RandomForestClassifier` entrenado. Ejecuta las predicciones en tiempo real.
-- **`models/model_metadata.json`**: Ficha técnica legible con metadatos (features requeridas, `target`, `random_state` y métricas de desempeño como `accuracy`, `f1` y `auc`).
+---
 
-La aplicación indica en pantalla si cargó el artefacto serializado o si activó el fallback determinístico.
-
-## Ejecución local
+## Ejecución Local
 
 ```bash
+# 1. Clonar el repositorio
 git clone https://github.com/DavidPonce84/streamlit-demo.git
 cd streamlit-demo
-python -m venv .venv
-source .venv/bin/activate       # macOS/Linux
+
+# 2. Crear y activar el entorno virtual
+python3 -m venv .venv
+source .venv/bin/activate       # macOS / Linux
 # .venv\Scripts\activate      # Windows
+
+# 3. Actualizar pip e instalar dependencias
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+
+# 4. Iniciar la aplicación
 streamlit run app.py
 ```
 
-Abrir la URL local que muestra Streamlit, normalmente `http://localhost:8501`.
+Abrir la URL local en el navegador: **`http://localhost:8501`**
 
-## Recorrido recomendado para la clase
+---
 
-### Tab 1 — Predicción + XAI
+## ¿Cómo Gestiona el Sistema los Modelos?
 
-1. Mostrar métricas del Random Forest.
-2. Ingresar datos manualmente.
-3. Explicar la probabilidad predicha.
-4. Interpretar la importancia global.
-5. Mostrar explicación local.
-6. Subir un CSV y descargar predicciones masivas.
+### 1. PyTorch MobileNetV2 (Visión)
+- **Primera ejecución:** Al subir una imagen por primera vez en la Pestaña 2, PyTorch descarga automáticamente los pesos oficiales de ImageNet (~14 MB) desde los servidores de PyTorch.
+- **Caché Local:** Se almacenan localmente en `~/.cache/torch/hub/checkpoints/mobilenet_v2-7ebf99e0.pth`.
+- **Siguientes ejecuciones:** Se cargan directamente desde el disco sin consumir conexión a internet.
 
-CSV mínimo:
+### 2. Modelo Tabular (Random Forest / XGBoost)
+- **Random Forest (Incluido):** Se carga desde `models/random_forest_renewal.joblib` validado con `models/model_metadata.json`.
+- **Evolución con XGBoost:** Para entrenar o reemplazar con XGBoost, se instala `pip install xgboost`, se entrena con `model.fit(X_train, y_train)` y se guarda localmente mediante `joblib.dump(model, "models/xgboost_renewal.joblib")` o `model.save_model("models/xgboost_renewal.json")`.
 
-```csv
-ingreso_mensual,antiguedad_meses,tickets_previos,satisfaccion,tiempo_respuesta
-1200,18,3,8,10
-```
+---
 
-### Tab 2 — Visión
+## Recorrido Recomendado para la Clase / Demo
 
-Subir una imagen y observar la predicción, probabilidades y advertencia de limitaciones. El baseline incluido es intencionalmente offline y didáctico; el modo avanzado MobileNetV2 está documentado, pero no se activa por defecto para evitar descargas durante el demo.
+### Tab 1 — Predicción & XAI
+1. Evaluar las métricas generales en las tarjetas Apple Widget (`Accuracy`, `F1`, `AUC-ROC`).
+2. Probar la **Entrada Manual Interactiva** y presionar **🔮 Predecir & Explicar**.
+3. Observar el **Donut Gauge** de probabilidad y el **Gráfico Bidireccional de Explicabilidad Local** (verde para variables que favorecen la renovación, rojo para las que la desfavorecen).
+4. Analizar el gráfico de **Importancia Global de Características**.
 
-### Tab 3 — RAG/chatbot controlado
+### Tab 2 — Visión Artificial
+1. Cargar una imagen de prueba (ej. vehículo, animal, objeto).
+2. Observar la inferencia en tiempo real con **MobileNetV2 (PyTorch)** y el gráfico de **Top-5 Clases Predichas**.
+3. Probar el checkbox *"Usar baseline heurístico didáctico"* para mostrar el modo offline de respaldo.
 
-Preguntas sugeridas:
+### Tab 3 — RAG Conversacional Local
+1. Probar los botones de **Preguntas Sugeridas** (*¿Cómo se ejecuta la app?*, *¿Qué es SHAP?*, *¿Qué es MobileNetV2?*).
+2. Observar la respuesta fundamentada y las **Fuentes & Citas Documentales** con su puntuación de relevancia.
 
-- `¿Cómo se ejecuta la aplicación?`
-- `¿Qué es SHAP?`
-- `¿Qué significa RAG?`
-- `¿Cómo se explican los modelos?`
+---
 
-Después realizar una pregunta que no esté documentada para mostrar la respuesta de insuficiencia de evidencia. La configuración `.env` es opt-in; el modo base no llama proveedores externos.
-
-## Arquitectura
-
-```text
-Usuario
-  ↓
-Streamlit
-  ├── src/tabular.py          → Random Forest + CSV
-  ├── src/explainability.py   → SHAP/LIME/fallback
-  ├── src/vision.py           → baseline de imagen offline
-  └── src/rag.py              → recuperación local + fuentes
-```
-
-## Reproducibilidad
-
-- Semilla fija: `random_state=42`.
-- Dataset sintético generado localmente.
-- Documentos RAG versionados en `documents/`.
-- No descarga modelos durante la ejecución.
-- Dependencias principales versionadas.
-- Tests automatizados en `tests/`.
-
-## Limitaciones honestas
-
-- Los datos tabulares son sintéticos y sirven para demostración.
-- SHAP y LIME son opcionales; sin ellos se muestran fallbacks explícitos.
-- El clasificador de visión incluido es un baseline heurístico offline, no un modelo de visión de producción.
-- El RAG utiliza coincidencia léxica local, no embeddings ni un LLM generativo.
-- Una explicación no demuestra causalidad y una confianza alta no garantiza exactitud.
-
-## Evolución avanzada opcional
-
-Una segunda versión puede activar:
-
-- XGBoost.
-- MobileNetV2/ResNet con pesos predescargados.
-- Embeddings vectoriales.
-- LLM local con Ollama.
-- API externa mediante variables de entorno.
-
-Estas extensiones deben conservar el modo base offline para que el demo no dependa de la red.
-
-## Tests
+## Pruebas Automatizadas
 
 ```bash
-pytest -q
+pytest -v
 ```
+*(Valida los 24 tests unitarios de la aplicación).*
+
+---
 
 ## Licencia
 
-Material educativo. Añadir una licencia específica antes de publicar el repositorio institucionalmente.
-
-## Demo de respaldo
-
-Antes de una clase en vivo, ejecutar el checklist de `docs/live_demo_checklist.md` y conservar capturas de la aplicación funcionando.
+Material educativo para demostración de arquitectura de Inteligencia Aplicada.
