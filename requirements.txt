@@ -1,0 +1,17 @@
+streamlit==1.41.1
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.6.1
+Pillow==11.1.0
+matplotlib==3.10.0
+joblib==1.4.2
+pytest==8.3.4
+python-dotenv==1.0.1
+# Opcionales: activan explicaciones reales si se instalan
+# shap==0.46.0
+# lime==0.2.0.1
+# xgboost==2.1.3
+# torch==2.5.1
+# torchvision==0.20.1
+
+# Versiones orientativas; validar compatibilidad con el entorno de despliegue.

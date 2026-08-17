@@ -1,0 +1,18 @@
+{
+  "model_type": "RandomForestClassifier",
+  "target": "renovara",
+  "features": [
+    "ingreso_mensual",
+    "antiguedad_meses",
+    "tickets_previos",
+    "satisfaccion",
+    "tiempo_respuesta"
+  ],
+  "random_state": 42,
+  "training_rows": 600,
+  "metrics_holdout": {
+    "accuracy": 0.8666666666666667,
+    "f1": 0.8873239436619719,
+    "auc": 0.9288571428571429
+  }
+}
