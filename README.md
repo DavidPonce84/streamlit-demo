@@ -21,7 +21,52 @@ Showcase educativo e interactivo con interfaz inspirada en el **Design System de
 
 ---
 
-## Estructura Relevante
+## Arquitectura de Módulos (`src/`)
+
+```text
+                               ┌──────────────────────────┐
+                               │     app.py (UI Layer)    │
+                               └────────────┬─────────────┘
+                                            │
+   ┌──────────────────────┬─────────────────┼──────────────────┬──────────────────────┐
+   ▼                      ▼                 ▼                  ▼                      ▼
+┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌──────────────────┐
+│  ui_comp.py  │   │  tabular.py  │   │  explain.py  │   │  vision.py   │   │  rag.py & chat   │
+└──────────────┘   └──────────────┘   └──────────────┘   └──────────────┘   └──────────────────┘
+   Apple UI &         Dataset,          SHAP, LIME       PyTorch MobileNet     Motor RAG Local,
+   Altair Charts      Entrenamiento,    & Permutación    & Baseline didáctico  Citas & Respuestas
+                      & Métricas        Fallbacks
+```
+
+### Detalle de Módulos:
+
+1. **[`src/ui_components.py`](file:///Users/davo/Downloads/Projects/streamlit-ai-lab/src/ui_components.py):**
+   - **`inject_apple_theme()`**: Inyecta el sistema de diseño CSS (tarjetas glassmorphism, tipografía *Plus Jakarta Sans*, hero banner y badges de estado).
+   - **Visualizaciones Altair**: Genera gráficos interactivos como `create_donut_gauge()`, `create_global_importance_chart()`, `create_local_explanation_chart()` (impacto positivo/negativo) y `create_vision_probabilities_chart()` (Top-5 clases).
+
+2. **[`src/tabular.py`](file:///Users/davo/Downloads/Projects/streamlit-ai-lab/src/tabular.py):**
+   - **`build_demo_dataset()`**: Genera el dataset sintético reproducible con semilla fija (`random_state=42`).
+   - **`train_tabular_model()`**: Entrena y evalúa el modelo `RandomForestClassifier`.
+   - **`predict_tabular()`**: Procesa predicciones individuales y masivas desde CSV.
+
+3. **[`src/explainability.py`](file:///Users/davo/Downloads/Projects/streamlit-ai-lab/src/explainability.py):**
+   - **`global_importance()` & `local_explanation()`**: Detección dinámica de **SHAP** (`shap_available()`) y **LIME** (`lime_available()`).
+   - Si no están instaladas las librerías opcionales, conmuta transparentemente a permuted feature importance y firmados por perturbación.
+
+4. **[`src/vision.py`](file:///Users/davo/Downloads/Projects/streamlit-ai-lab/src/vision.py):**
+   - **`classify_image_mobilenet()`**: Inferencia visual con PyTorch y el modelo preentrenado **MobileNetV2** (ImageNet-1K). Normaliza la distribución Top-5 para la interfaz.
+   - **`classify_image()`**: Conmutador inteligente con fallback al baseline didáctico offline (`force_baseline=True`).
+
+5. **[`src/rag.py`](file:///Users/davo/Downloads/Projects/streamlit-ai-lab/src/rag.py) & [`src/chatbot.py`](file:///Users/davo/Downloads/Projects/streamlit-ai-lab/src/chatbot.py):**
+   - **`LocalRAG`**: Carga y procesa la base documental en `documents/`. Realiza la recuperación léxica (TF-IDF/Jaccard) extrayendo fragmentos con sus puntajes de relevancia.
+   - **`answer_controlled()`**: Genera respuestas conversacionales fundamentadas en las citas recuperadas y maneja estados de falta de evidencia.
+
+6. **[`src/model_registry.py`](file:///Users/davo/Downloads/Projects/streamlit-ai-lab/src/model_registry.py):**
+   - **`load_model_artifact()`**: Carga y valida la integridad del binario `models/random_forest_renewal.joblib` y sus metadatos `models/model_metadata.json`. Si falta el archivo, entrena un fallback determinístico en memoria.
+
+---
+
+## Estructura de Directorios
 
 ```text
 app.py                                # Interfaz principal Streamlit con Apple Design System
